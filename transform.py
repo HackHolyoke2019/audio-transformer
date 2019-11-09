@@ -3,7 +3,10 @@ import sys
 import wave
 import numpy as np
 import uuid
+import subprocess
+import os
 
+SNIPPET_DIR = '/tmp/'
 target_snippet_size = 14
 n_frames = 1
 channels = 1
@@ -12,7 +15,7 @@ sample_width = 2 # 16 bits
 read_size = n_frames * channels * sample_width * sample_rate # Read 1 second at a time
 
 def open_wav_f():
-    name = 'snippets/' + str(uuid.uuid4()) + '.wav'
+    name = SNIPPET_DIR + str(uuid.uuid4()) + '.wav'
 
     wavf = wave.open(name, 'wb')
     wavf.setnchannels(channels)
@@ -36,6 +39,10 @@ with open('/dev/stdin', 'rb') as stdin:
 
         if volume < 1000 or snippet_size >= target_snippet_size:
             current_snippet.close()
+            
+            # DO SOMETHING
+            subprocess.run([os.env['UPLOAD_SCRIPT'], snippet_name])
+                            
             current_snippet, snippet_name = open_wav_f()
             snippet_size = 0
             print("new snippet", snippet_name)
